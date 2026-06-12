@@ -1,0 +1,66 @@
+calendar:
+  default_start_date: "2015-01-01"
+  daily_forward_fill_limit:
+    daily: 10
+    weekly: 14
+    monthly: 45
+    quarterly: 120
+    annual: 500
+
+scoring:
+  robust_window_days: 756
+  z_window_days: 756
+  percentile_windows:
+    percentile_1y: 252
+    percentile_5y: 1260
+    percentile_10y: 2520
+  change_windows:
+    change_1m: 21
+    change_3m: 63
+  min_history_days: 90
+  neutral_missing_score:
+
+force_weights:
+  macro_fragility:
+    debt_money_score: 0.30
+    internal_disorder_score: 0.25
+    geopolitical_conflict_score: 0.25
+    nature_shock_score: 0.20
+  productivity_upside:
+    tech_productivity_score: 1.00
+
+component_weights:
+  internal_disorder:
+    real_world: 0.65
+    market_pricing: 0.35
+  geopolitical_conflict:
+    real_world: 0.45
+    economic_transmission: 0.25
+    market_pricing: 0.30
+  nature:
+    tactical: 0.70
+    structural: 0.30
+  technology:
+    productivity: 0.50
+    fragility: 0.50
+
+confidence:
+  missing_required_penalty: 12
+  missing_optional_penalty: 3
+  stale_penalty_per_window: 8
+  source_quality_weight: 0.30
+  availability_weight: 0.45
+  freshness_weight: 0.25
+
+source_quality:
+  fred: 95
+  market: 80
+  market_basket: 75
+  gpr: 85
+  gdelt: 65
+  nature: 35
+
+reporting:
+  max_key_drivers: 5
+  extreme_score_threshold: 80
+  deterioration_threshold: 15

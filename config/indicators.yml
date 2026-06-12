@@ -1,0 +1,584 @@
+indicators:
+  fed_funds:
+    name: Effective federal funds rate
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: FEDFUNDS
+    transform: level
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: false
+    required: true
+    notes: Higher policy rates increase debt-service and liquidity pressure.
+
+  treasury_10y:
+    name: 10-year Treasury yield
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DGS10
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: true
+    notes: Higher long rates can pressure duration assets and debt refinancing.
+
+  treasury_2y:
+    name: 2-year Treasury yield
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DGS2
+    transform: level
+    direction: positive
+    weight: 0.7
+    market_pricing_flag: false
+    required: true
+    notes: Front-end rates proxy near-term policy restriction.
+
+  yield_curve_10y_2y:
+    name: 10Y minus 2Y Treasury spread
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: daily
+    ticker_or_series_id: T10Y2Y
+    transform: level
+    direction: negative
+    weight: 1.0
+    market_pricing_flag: false
+    required: true
+    notes: Lower or inverted curve maps to greater cycle pressure.
+
+  cpi_yoy:
+    name: CPI year-over-year inflation
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: CPIAUCSL
+    transform: yoy_pct_change
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: false
+    required: true
+    notes: Higher inflation pressure can limit policy flexibility.
+
+  core_cpi_yoy:
+    name: Core CPI year-over-year inflation
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: CPILFESL
+    transform: yoy_pct_change
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: false
+    required: true
+    notes: Core inflation is a policy-relevant inflation pressure proxy.
+
+  unemployment_rate:
+    name: Unemployment rate
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: UNRATE
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: true
+    notes: Higher unemployment maps to weaker economic cycle conditions.
+
+  high_yield_spread:
+    name: ICE BofA US high yield option-adjusted spread
+    force: debt_money
+    component: market_pricing
+    source: fred
+    frequency: daily
+    ticker_or_series_id: BAMLH0A0HYM2
+    transform: level
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: true
+    required: true
+    notes: Credit spreads are market pricing of debt stress.
+
+  broad_dollar:
+    name: Nominal broad US dollar index
+    force: debt_money
+    component: market_pricing
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DTWEXBGS
+    transform: momentum_63d
+    direction: positive
+    weight: 0.6
+    market_pricing_flag: true
+    required: false
+    notes: Dollar strength can reflect global liquidity stress.
+
+  m2_growth:
+    name: M2 money stock YoY growth
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: M2SL
+    transform: yoy_pct_change
+    direction: negative
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Slower money growth maps to tighter liquidity pressure.
+
+  real_rate_10y:
+    name: 10-year TIPS real yield
+    force: debt_money
+    component: real_world
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DFII10
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Higher real rates raise discount-rate pressure.
+
+  epu_us_daily:
+    name: US economic policy uncertainty index
+    force: internal_disorder
+    component: real_world
+    source: fred
+    frequency: daily
+    ticker_or_series_id: USEPUINDXD
+    transform: level
+    direction: positive
+    weight: 1.4
+    market_pricing_flag: false
+    required: true
+    notes: Daily news-based US policy uncertainty from FRED.
+
+  trade_policy_uncertainty:
+    name: Trade policy uncertainty index
+    force: internal_disorder
+    component: real_world
+    source: fred
+    frequency: monthly
+    ticker_or_series_id: TRADEPOL
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Optional FRED trade-policy uncertainty series; skipped if unavailable.
+
+  gdelt_us_unrest:
+    name: GDELT US protest and unrest intensity
+    force: internal_disorder
+    component: real_world
+    source: gdelt
+    frequency: daily
+    ticker_or_series_id: gdelt_us_unrest
+    query: "(protest OR riot OR unrest OR strike) sourcecountry:US"
+    transform: level
+    direction: positive
+    weight: 0.9
+    market_pricing_flag: false
+    required: false
+    notes: News-intensity proxy, not an official unrest count.
+
+  gdelt_us_policy_conflict:
+    name: GDELT US policy conflict intensity
+    force: internal_disorder
+    component: real_world
+    source: gdelt
+    frequency: daily
+    ticker_or_series_id: gdelt_us_policy_conflict
+    query: "\"debt ceiling\" OR \"government shutdown\" OR \"political violence\" sourcecountry:US"
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Daily news-intensity proxy for acute domestic policy conflict.
+
+  vix_internal:
+    name: VIX index
+    force: internal_disorder
+    component: market_pricing
+    source: market
+    frequency: daily
+    ticker_or_series_id: ^VIX
+    transform: level
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: true
+    required: true
+    notes: Equity volatility as market pricing of risk.
+
+  credit_spread_internal:
+    name: High yield spread for internal disorder market pricing
+    force: internal_disorder
+    component: market_pricing
+    source: fred
+    frequency: daily
+    ticker_or_series_id: BAMLH0A0HYM2
+    transform: level
+    direction: positive
+    weight: 0.9
+    market_pricing_flag: true
+    required: true
+    notes: Credit spreads reused as market pricing of broad domestic stress.
+
+  gpr_index:
+    name: Caldara-Iacoviello geopolitical risk index
+    force: geopolitical_conflict
+    component: real_world
+    source: gpr
+    frequency: monthly
+    ticker_or_series_id: GPR
+    transform: level
+    direction: positive
+    weight: 1.5
+    market_pricing_flag: false
+    required: false
+    notes: External spreadsheet endpoint; connector logs format failures.
+
+  gdelt_global_conflict:
+    name: GDELT global conflict news intensity
+    force: geopolitical_conflict
+    component: real_world
+    source: gdelt
+    frequency: daily
+    ticker_or_series_id: gdelt_global_conflict
+    query: "war OR invasion OR missile OR military OR escalation"
+    transform: level
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: false
+    required: false
+    notes: Daily global conflict news-intensity proxy.
+
+  gdelt_sanctions:
+    name: GDELT sanctions news intensity
+    force: geopolitical_conflict
+    component: real_world
+    source: gdelt
+    frequency: daily
+    ticker_or_series_id: gdelt_sanctions
+    query: "sanction OR sanctions OR embargo"
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Daily sanctions news-intensity proxy.
+
+  wti_oil_momentum:
+    name: WTI oil 1-month momentum
+    force: geopolitical_conflict
+    component: economic_transmission
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DCOILWTICO
+    transform: momentum_21d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Oil price spikes can transmit geopolitical risk to inflation and growth.
+
+  brent_oil_momentum:
+    name: Brent oil 1-month momentum
+    force: geopolitical_conflict
+    component: economic_transmission
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DCOILBRENTEU
+    transform: momentum_21d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: false
+    required: false
+    notes: Brent complements WTI as a global oil shock proxy.
+
+  natural_gas_momentum_geo:
+    name: Henry Hub natural gas 1-month momentum
+    force: geopolitical_conflict
+    component: economic_transmission
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DHHNGSP
+    transform: momentum_21d
+    direction: positive
+    weight: 0.6
+    market_pricing_flag: false
+    required: false
+    notes: Gas spikes can indicate energy-transmission stress.
+
+  gold_momentum_geo:
+    name: Gold ETF 3-month momentum
+    force: geopolitical_conflict
+    component: market_pricing
+    source: market
+    frequency: daily
+    ticker_or_series_id: GLD
+    transform: momentum_63d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Gold strength is one market hedge proxy.
+
+  vix_geopolitical:
+    name: VIX index for geopolitical market pricing
+    force: geopolitical_conflict
+    component: market_pricing
+    source: market
+    frequency: daily
+    ticker_or_series_id: ^VIX
+    transform: level
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Equity volatility can reflect priced conflict risk.
+
+  defense_relative:
+    name: Defense ETF relative strength versus SPY
+    force: geopolitical_conflict
+    component: market_pricing
+    source: market
+    frequency: daily
+    ticker_or_series_id: ITA
+    benchmark_ticker: SPY
+    transform: relative_momentum_63d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Defense relative strength is a market-pricing proxy.
+
+  usd_momentum_geo:
+    name: US dollar ETF 3-month momentum
+    force: geopolitical_conflict
+    component: market_pricing
+    source: market
+    frequency: daily
+    ticker_or_series_id: UUP
+    transform: momentum_63d
+    direction: positive
+    weight: 0.5
+    market_pricing_flag: true
+    required: false
+    notes: Dollar strength can represent safe-haven pricing.
+
+  gdelt_nature_shock:
+    name: GDELT climate and disaster news intensity
+    force: nature
+    component: tactical
+    source: gdelt
+    frequency: daily
+    ticker_or_series_id: gdelt_nature_shock
+    query: "wildfire OR flood OR drought OR hurricane OR earthquake OR pandemic"
+    transform: level
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: false
+    required: false
+    notes: Tactical daily news proxy for acute natural shocks.
+
+  agriculture_momentum:
+    name: Agriculture ETF 3-month momentum
+    force: nature
+    component: tactical
+    source: market
+    frequency: daily
+    ticker_or_series_id: DBA
+    transform: momentum_63d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Agricultural commodity momentum can reflect food-supply pressure.
+
+  natural_gas_momentum_nature:
+    name: Natural gas 1-month momentum for nature shock
+    force: nature
+    component: tactical
+    source: fred
+    frequency: daily
+    ticker_or_series_id: DHHNGSP
+    transform: momentum_21d
+    direction: positive
+    weight: 0.6
+    market_pricing_flag: true
+    required: false
+    notes: Weather-sensitive energy price pressure proxy.
+
+  insurance_relative:
+    name: Insurance ETF relative strength versus SPY
+    force: nature
+    component: tactical
+    source: market
+    frequency: daily
+    ticker_or_series_id: KIE
+    benchmark_ticker: SPY
+    transform: relative_momentum_63d
+    direction: negative
+    weight: 0.5
+    market_pricing_flag: true
+    required: false
+    notes: Relative weakness in insurers can reflect disaster-loss pricing.
+
+  utilities_relative:
+    name: Utilities ETF relative strength versus SPY
+    force: nature
+    component: tactical
+    source: market
+    frequency: daily
+    ticker_or_series_id: XLU
+    benchmark_ticker: SPY
+    transform: relative_momentum_63d
+    direction: negative
+    weight: 0.4
+    market_pricing_flag: true
+    required: false
+    notes: Utility relative weakness can reflect power/weather stress.
+
+  nature_structural_placeholder:
+    name: Placeholder structural nature pressure
+    force: nature
+    component: structural
+    source: nature
+    frequency: annual
+    ticker_or_series_id: structural_placeholder
+    transform: level
+    direction: positive
+    weight: 0.3
+    market_pricing_flag: false
+    required: false
+    notes: Explicit placeholder until official disaster/climate data is wired.
+
+  qqq_relative_strength:
+    name: QQQ relative strength versus SPY
+    force: technology
+    component: productivity
+    source: market
+    frequency: daily
+    ticker_or_series_id: QQQ
+    benchmark_ticker: SPY
+    transform: relative_momentum_63d
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: true
+    required: true
+    notes: Nasdaq relative strength as market-implied tech productivity impulse.
+
+  smh_relative_strength:
+    name: Semiconductor ETF relative strength versus SPY
+    force: technology
+    component: productivity
+    source: market
+    frequency: daily
+    ticker_or_series_id: SMH
+    benchmark_ticker: SPY
+    transform: relative_momentum_63d
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: true
+    required: false
+    notes: Semiconductors proxy AI and compute-infrastructure cycle strength.
+
+  ai_infra_basket_momentum:
+    name: AI infrastructure basket 3-month momentum
+    force: technology
+    component: productivity
+    source: market_basket
+    frequency: daily
+    ticker_or_series_id: NVDA,AMD,AVGO,TSM,ASML,MU,ANET,VRT
+    transform: momentum_63d
+    direction: positive
+    weight: 1.0
+    market_pricing_flag: true
+    required: false
+    notes: Equal-weight market proxy for AI infrastructure impulse.
+
+  labor_productivity:
+    name: Nonfarm business labor productivity
+    force: technology
+    component: productivity
+    source: fred
+    frequency: quarterly
+    ticker_or_series_id: OPHNFB
+    transform: yoy_pct_change
+    direction: positive
+    weight: 0.7
+    market_pricing_flag: false
+    required: false
+    notes: Slow-moving realized productivity proxy.
+
+  qqq_drawdown_risk:
+    name: QQQ 1-year drawdown pressure
+    force: technology
+    component: fragility
+    source: market
+    frequency: daily
+    ticker_or_series_id: QQQ
+    transform: drawdown_252d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Larger drawdowns raise tech-fragility score.
+
+  qqq_momentum_extension:
+    name: QQQ 3-month momentum extension
+    force: technology
+    component: fragility
+    source: market
+    frequency: daily
+    ticker_or_series_id: QQQ
+    transform: momentum_63d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Strong positive momentum can signal crowding or extrapolation risk.
+
+  smh_momentum_extension:
+    name: SMH 3-month momentum extension
+    force: technology
+    component: fragility
+    source: market
+    frequency: daily
+    ticker_or_series_id: SMH
+    transform: momentum_63d
+    direction: positive
+    weight: 0.8
+    market_pricing_flag: true
+    required: false
+    notes: Semiconductor momentum extension as crowding proxy.
+
+  ai_basket_drawdown_risk:
+    name: AI basket 1-year drawdown pressure
+    force: technology
+    component: fragility
+    source: market_basket
+    frequency: daily
+    ticker_or_series_id: NVDA,AMD,AVGO,TSM,ASML,MU,ANET,VRT
+    transform: drawdown_252d
+    direction: positive
+    weight: 0.7
+    market_pricing_flag: true
+    required: false
+    notes: Drawdown risk in AI infrastructure basket.
