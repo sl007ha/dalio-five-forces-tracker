@@ -1,0 +1,64 @@
+name: Import project archive
+
+on:
+  push:
+    paths:
+      - ".github/workflows/import-project.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract archive into repository
+        shell: python
+        run: |
+          import base64
+          import pathlib
+          import zipfile
+
+          root = pathlib.Path.cwd()
+          chunk_dir = root / ".github" / "import"
+          chunks = sorted(chunk_dir.glob("project.zip.b64.part*"))
+          if not chunks:
+              raise SystemExit("No archive chunks found")
+
+          encoded = "".join(chunk.read_text(encoding="utf-8").strip() for chunk in chunks)
+          zip_path = pathlib.Path("/tmp/dalio-five-forces-tracker.zip")
+          zip_path.write_bytes(base64.b64decode(encoded))
+
+          with zipfile.ZipFile(zip_path) as zf:
+              bad = zf.testzip()
+              if bad:
+                  raise RuntimeError(f"Corrupt zip member: {bad}")
+
+              for info in zf.infolist():
+                  if info.is_dir():
+                      continue
+                  normalized = info.filename.replace("\\", "/")
+                  path_parts = pathlib.PurePosixPath(normalized).parts
+                  if not path_parts or any(part in ("", ".", "..") for part in path_parts):
+                      raise RuntimeError(f"Unsafe zip path: {info.filename}")
+
+                  target = root.joinpath(*path_parts)
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(zf.read(info))
+
+      - name: Commit imported project
+        shell: bash
+        run: |
+          rm -rf .github/import
+          rm -f .github/workflows/import-project.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Import Dalio five forces tracker project"
+            git push
+          fi
